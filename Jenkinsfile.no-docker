@@ -1,0 +1,50 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_USERNAME = 'nuwanpriyamal'
+    }
+    
+    stages {
+        stage('Stage 1: Git Pull') {
+            steps {
+                echo 'Stage 1: Pulling Git Repository'
+                git branch: 'gscomp268', url: 'https://github.com/nuwanpriyamal/NCC_2025.git'
+                sh 'git log --oneline -1'
+            }
+        }
+        
+        stage('Stage 2: Verify Files') {
+            steps {
+                echo 'Stage 2: Verifying project files'
+                sh 'pwd'
+                sh 'ls -la'
+                sh 'ls -la backend2/'
+                sh 'ls -la frontend2/'
+                sh 'cat backend2/Dockerfile'
+                sh 'cat frontend2/Dockerfile'
+            }
+        }
+        
+        stage('Stage 3: Test Docker Commands') {
+            steps {
+                echo 'Stage 3: Testing Docker availability'
+                sh 'which docker || echo "Docker not found"'
+                sh 'docker --version || echo "Docker not installed"'
+                sh 'docker info || echo "Docker daemon not running"'
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline completed'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}

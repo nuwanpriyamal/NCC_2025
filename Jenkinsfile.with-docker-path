@@ -3,6 +3,7 @@ pipeline {
     
     environment {
         DOCKER_USERNAME = 'nuwanpriyamal'
+        DOCKER_PATH = '/usr/local/bin/docker'
     }
     
     stages {
@@ -17,21 +18,19 @@ pipeline {
         stage('Stage 2: Build Docker Images') {
             steps {
                 echo 'Stage 2: Building Docker Images'
-                echo 'Note: Docker images have been built locally:'
-                echo '  - nuwanpriyamal/backend2:latest'
-                echo '  - nuwanpriyamal/frontend2:latest'
-                sh 'echo "Docker build simulation - images already built locally"'
+                sh '${DOCKER_PATH} build -t nuwanpriyamal/backend2:latest ./backend2'
+                sh '${DOCKER_PATH} build -t nuwanpriyamal/frontend2:latest ./frontend2'
             }
         }
         
         stage('Stage 3: Push to Docker Hub') {
             steps {
                 echo 'Stage 3: Pushing Images to Docker Hub'
-                echo 'Note: To push images, run these commands locally:'
-                echo '  docker push nuwanpriyamal/backend2:latest'
-                echo '  docker push nuwanpriyamal/frontend2:latest'
-                echo 'Make sure to create repositories on Docker Hub first!'
-                sh 'echo "Docker push simulation - run commands locally"'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo $DOCKER_PASSWORD | ${DOCKER_PATH} login -u $DOCKER_USERNAME --password-stdin'
+                    sh '${DOCKER_PATH} push nuwanpriyamal/backend2:latest'
+                    sh '${DOCKER_PATH} push nuwanpriyamal/frontend2:latest'
+                }
             }
         }
     }
@@ -42,7 +41,6 @@ pipeline {
         }
         success {
             echo 'Pipeline completed successfully!'
-            echo 'Docker images are ready for push to Docker Hub'
         }
         failure {
             echo 'Pipeline failed!'
