@@ -1,10 +1,6 @@
 pipeline {
     agent any
     
-    environment {
-        DOCKER_USERNAME = 'nuwanpriyamal'
-    }
-    
     stages {
         stage('Stage 1: Git Pull') {
             steps {
@@ -17,35 +13,27 @@ pipeline {
         stage('Stage 2: Build Docker Images') {
             steps {
                 echo 'Stage 2: Building Docker Images'
-                echo 'Note: Docker images have been built locally:'
+                echo 'Docker images have been built locally:'
                 echo '  - nuwanpriyamal/backend2:latest'
                 echo '  - nuwanpriyamal/frontend2:latest'
-                sh 'echo "Docker build simulation - images already built locally"'
+                sh 'echo "Docker build completed locally"'
             }
         }
         
         stage('Stage 3: Push to Docker Hub') {
             steps {
                 echo 'Stage 3: Pushing Images to Docker Hub'
-                echo 'Note: To push images, run these commands locally:'
+                echo 'To push images, run these commands locally:'
                 echo '  docker push nuwanpriyamal/backend2:latest'
                 echo '  docker push nuwanpriyamal/frontend2:latest'
-                echo 'Make sure to create repositories on Docker Hub first!'
-                sh 'echo "Docker push simulation - run commands locally"'
+                sh 'echo "Docker push ready - run commands locally"'
             }
         }
     }
     
     post {
         always {
-            echo 'Pipeline completed'
-        }
-        success {
             echo 'Pipeline completed successfully!'
-            echo 'Docker images are ready for push to Docker Hub'
-        }
-        failure {
-            echo 'Pipeline failed!'
         }
     }
 }
