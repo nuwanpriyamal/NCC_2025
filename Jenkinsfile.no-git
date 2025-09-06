@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_USERNAME = 'gscomp268'
+        BACKEND_IMAGE = 'backend2'
+        FRONTEND_IMAGE = 'frontend2'
+        TAG = 'latest'
+    }
+    
+    stages {
+        stage('Stage 1: Prepare Workspace') {
+            steps {
+                echo 'Stage 1: Preparing workspace'
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+        
+        stage('Stage 2: Build Docker Images') {
+            steps {
+                echo 'Stage 2: Building Docker Images'
+                sh 'docker build -t gscomp268/backend2:latest ./backend2'
+                sh 'docker build -t gscomp268/frontend2:latest ./frontend2'
+            }
+        }
+        
+        stage('Stage 3: Push to Docker Hub') {
+            steps {
+                echo 'Stage 3: Pushing Images to Docker Hub'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    sh 'docker push gscomp268/backend2:latest'
+                    sh 'docker push gscomp268/frontend2:latest'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            echo 'Pipeline completed'
+        }
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}

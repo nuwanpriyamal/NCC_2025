@@ -1,18 +1,22 @@
 services:
   backend2:
     build: ./backend2
+    image: nuwanpriyamal/backend2:latest
     container_name: backend2
     ports:
-      - "5000:5000"
+      - "5001:5000"
     networks:
       - app-network
     restart: unless-stopped
+    environment:
+      - NODE_ENV=production
 
   frontend2:
     build: ./frontend2
+    image: nuwanpriyamal/frontend2:latest
     container_name: frontend2
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - backend2
     networks:

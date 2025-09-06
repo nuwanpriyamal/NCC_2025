@@ -1,33 +1,52 @@
 #!/bin/bash
 
-# Build and Push Script for Docker Hub
-# Replace these variables with your actual Docker Hub username and index number
-DOCKERHUB_USERNAME="nuwanpriyamal"
-INDEX_NUMBER="gscomp268"
+# Docker Hub Build and Push Script
+# This script builds and pushes Docker images to Docker Hub
 
-echo "Building Docker images..."
+set -e  # Exit on any error
+
+# Configuration
+DOCKER_USERNAME="nuwanpriyamal"
+BACKEND_IMAGE="backend2"
+FRONTEND_IMAGE="frontend2"
+TAG="latest"
+
+echo "🐳 Starting Docker build and push process..."
+
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+    echo "❌ Docker is not running. Please start Docker and try again."
+    exit 1
+fi
+
+# Login to Docker Hub (user will be prompted for credentials)
+echo "🔐 Logging into Docker Hub..."
+docker login
 
 # Build backend image
-echo "Building backend image..."
-docker build -t ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-backend:latest ./backend2
+echo "🔨 Building backend image: $DOCKER_USERNAME/$BACKEND_IMAGE:$TAG"
+docker build -t $DOCKER_USERNAME/$BACKEND_IMAGE:$TAG ./backend2
 
 # Build frontend image
-echo "Building frontend image..."
-docker build -t ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-frontend:latest ./frontend2
+echo "🔨 Building frontend image: $DOCKER_USERNAME/$FRONTEND_IMAGE:$TAG"
+docker build -t $DOCKER_USERNAME/$FRONTEND_IMAGE:$TAG ./frontend2
 
-echo "Images built successfully!"
-echo ""
-echo "To push to Docker Hub, run:"
-echo "docker login"
-echo "docker push ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-backend:latest"
-echo "docker push ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-frontend:latest"
-echo ""
-echo "Or run this script with 'push' argument:"
-echo "./build-and-push.sh push"
+# Push backend image
+echo "📤 Pushing backend image to Docker Hub..."
+docker push $DOCKER_USERNAME/$BACKEND_IMAGE:$TAG
 
-if [ "$1" = "push" ]; then
-    echo "Pushing images to Docker Hub..."
-    docker push ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-backend:latest
-    docker push ${DOCKERHUB_USERNAME}/${INDEX_NUMBER}-frontend:latest
-    echo "Images pushed successfully!"
-fi
+# Push frontend image
+echo "📤 Pushing frontend image to Docker Hub..."
+docker push $DOCKER_USERNAME/$FRONTEND_IMAGE:$TAG
+
+echo "✅ Successfully built and pushed all images to Docker Hub!"
+echo "📋 Images pushed:"
+echo "   - $DOCKER_USERNAME/$BACKEND_IMAGE:$TAG"
+echo "   - $DOCKER_USERNAME/$FRONTEND_IMAGE:$TAG"
+
+# Optional: Test the images locally
+echo "🧪 Testing images locally..."
+docker-compose up -d
+echo "🌐 Application is running at http://localhost:8080"
+echo "🔧 Backend API available at http://localhost:5001/api/hello"
+echo "⏹️  To stop the application, run: docker-compose down"
