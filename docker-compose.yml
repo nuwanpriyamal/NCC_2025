@@ -1,0 +1,24 @@
+services:
+  backend2:
+    build: ./backend2
+    container_name: backend2
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend2:
+    build: ./frontend2
+    container_name: frontend2
+    ports:
+      - "80:80"
+    depends_on:
+      - backend2
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
